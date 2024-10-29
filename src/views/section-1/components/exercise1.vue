@@ -35,6 +35,7 @@ const currency = (value) => {
 };
 </script>
 
+
 <template>
   <div :class="classObject" class="mt-[10px]">
     <h2 :style="{ color: inStock ? 'green' : 'red' }">{{ product }}</h2>
