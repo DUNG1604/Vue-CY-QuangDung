@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Section1 from "../views/section-1/index.vue"
 import Section2 from "../views/section-2/index.vue"
+import Section3 from "@/views/section-3/index.vue"
 import Ex1 from "../views/section-1/components/exercise1.vue"
 import Ex2 from "../views/section-1/components/exercise2.vue"
 import Ex3 from "../views/section-1/components/exercise3.vue"
@@ -10,6 +11,7 @@ import Ex6 from "../views/section-1/components/exercise6.vue"
 import Ex7 from "../views/section-1/components/exercise7.vue"
 import Ex2_1 from "@/views/section-2/components/exercise1.vue"
 import Ex2_2 from "@/views/section-2/components/exercise2.vue"
+import Ex3_1 from "@/views/section-3/components/exercise1.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,7 +74,19 @@ const router = createRouter({
           component: Ex2_2,
         },
       ]
-    }
+    },
+    {
+      path: '/section3',
+      name: 'section3',
+      component: Section3,
+      children:[
+        {
+          path: 'ex3.1',
+          name: 'Ex-3.1',
+          component: Ex3_1,
+        },
+      ]
+    },
   ]
 })
 

@@ -15,6 +15,11 @@ import { RouterLink, RouterView } from "vue-router";
           Section 2
         </button>
       </RouterLink>
+      <RouterLink to="/section3">
+        <button class="p-[5px] border-[1px] rounded-[10px] cursor-pointer">
+          Section 3
+        </button>
+      </RouterLink>
     </div>
     <RouterView />
   </div>
