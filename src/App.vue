@@ -1,10 +1,12 @@
-<script setup>
-</script>
-
 <template>
-  <div>
-    hello
-  </div>
+  <router-link :to="{name:'Home'}"></router-link>
+ <RouterView></RouterView>
 </template>
 
-<style scoped></style>
+<script setup>
+
+</script>
+
+<style lang="scss" scoped>
+
+</style>
