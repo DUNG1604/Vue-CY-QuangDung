@@ -141,7 +141,6 @@ const countTodo = computed(() => {
 const countDone = computed(() => {
   return listTodo.value.filter((item) => item.isDone).length;
 });
-
 </script>
 
 <style lang="scss" scoped></style>

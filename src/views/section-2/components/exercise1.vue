@@ -50,7 +50,7 @@
       <div class="flex flex-col items-center">
         <div>Chọn thương thức thanh toán</div>
         <form @submit.prevent="handleSubmit()" id="paymentForm" class="flex flex-col">
-          <label v-for="item in data.paymentMethods">
+          <label v-for="(item, index) in data.paymentMethods" :key="index">
             <input type="radio" name="payment" :value="item.text" v-model="payMethod"/>
             {{ item.text }}
           </label>

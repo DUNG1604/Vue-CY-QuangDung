@@ -1,29 +1,114 @@
 <template>
-  <div class="w-full mt-10">
-    <div class="flex float-end items-center gap-[10px]">
-      <span>Cart have {{ sumItem }} item</span>
-      <button
-        type="button"
-        class="btn btn-primary mr-[50px]"
-        data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop"
-      >
-        View Cart
-      </button>
+  <div class="flex flex-col">
+    <div class="w-full mt-10">
+      <div class="flex float-end items-center gap-[10px]">
+        <span>Cart have {{ sumItem }} item</span>
+        <button
+          type="button"
+          class="btn btn-primary mr-[50px]"
+          data-bs-toggle="modal"
+          data-bs-target="#staticBackdrop"
+        >
+          View Cart
+        </button>
 
+        <div
+          class="modal fade"
+          id="staticBackdrop"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabindex="-1"
+          aria-labelledby="staticBackdropLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Cart</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="overflow-y-scroll max-h-[300px]">
+                  <div
+                    v-for="(item, index) in cart.listCart"
+                    :key="index"
+                    class="grid grid-cols-6 gap-[10px] items-center mb-[10px]"
+                  >
+                    <div class="col-span-2">
+                      <div class="w-full h-[80px] overflow-hidden">
+                        <img class="w-full h-full object-cover" :src="item.img" alt="" />
+                      </div>
+                    </div>
+
+                    <div class="col-span-1">{{ item.name }}</div>
+                    <div class="col-span-1">{{ item.color }}</div>
+                    <div class="col-span-1">{{ formatCurrency(item.price) }}</div>
+                    <div class="col-span-1 text-center">{{ item.quantity }}</div>
+                  </div>
+                </div>
+                <div class="flex justify-end mr-[40px] mt-[20px] text-[20px] font-[600]">
+                  <div>Total: {{ formatCurrency(sumCart) }}</div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+                <button @click="handlePay()" type="button" class="btn btn-primary">
+                  Pay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-4 mt-5 px-12">
+        <div
+          v-for="(item, index) in listData"
+          :key="item.id"
+          class="relative col-span-1 border border-black rounded-lg overflow-hidden transform transition-transform hover:scale-105"
+        >
+          <div v-if="item.isHot" class="bg-yellow-300 p-1 absolute top-0 left-0">Hot</div>
+          <div class="w-full overflow-hidden">
+            <img class="w-full h-48 object-cover" :src="item.image" alt="Image" />
+          </div>
+          <div class="px-3 pb-2 flex justify-between items-center">
+            <div>
+              <div class="text-lg font-semibold">{{ item.name }}</div>
+              <div>Price: {{ formatCurrency(item.price) }}</div>
+            </div>
+            <button
+              @click="handleChooseItem(index)"
+              class="p-1 border border-black rounded-lg hover:bg-slate-400"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
       <div
         class="modal fade"
-        id="staticBackdrop"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
+        id="exampleModal"
         tabindex="-1"
-        aria-labelledby="staticBackdropLabel"
+        aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel">Cart</h5>
+              <h5 class="modal-title" id="exampleModalLabel">
+                {{ listData?.[item.indexItemAdd]?.name || null }}
+              </h5>
               <button
                 type="button"
                 class="btn-close"
@@ -32,145 +117,66 @@
               ></button>
             </div>
             <div class="modal-body">
-              <div class="overflow-y-scroll max-h-[300px]">
-                <div
-                  v-for="(item, index) in cart.listCart"
-                  :key="index"
-                  class="grid grid-cols-6 gap-[10px] items-center mb-[10px]"
-                >
-                  <div class="col-span-2">
-                    <div class="w-full h-[80px] overflow-hidden">
-                      <img class="w-full h-full object-cover" :src="item.img" alt="" />
+              <div class="mx-auto h-[200px] w-[90%] overflow-hidden">
+                <img
+                  class="w-full h-full object-cover"
+                  :src="setImg(item.selectedColor)"
+                  alt=""
+                />
+              </div>
+              <div class="grid grid-cols-6 mt-[10px]">
+                <div class="col-span-4">
+                  <div>
+                    Price:
+                    {{ formatCurrency(listData?.[item.indexItemAdd]?.price || null) }}
+                  </div>
+                  <div>Brand: {{ listData?.[item.indexItemAdd]?.brand || null }}</div>
+                  <div>
+                    Description: {{ listData?.[item.indexItemAdd]?.description || null }}
+                  </div>
+                  <div>
+                    Release:
+                    {{ formatDate(listData?.[item.indexItemAdd]?.release || "") }}
+                  </div>
+                </div>
+                <div class="col-span-2">
+                  <div>
+                    <div
+                      v-for="(option, index) in listData?.[item.indexItemAdd]?.option ||
+                      []"
+                      :key="index"
+                      class="flex items-center gap-[5px] mt-[5px]"
+                    >
+                      <input
+                        type="radio"
+                        :disabled="!checkQuantity(option.quantity || 0)"
+                        v-model="item.selectedColor"
+                        :value="option.color"
+                      />
+
+                      <div
+                        class="w-[30px] h-[30px] rounded-full"
+                        :style="{ backgroundColor: option.color }"
+                      ></div>
+
+                      <div>Quantity: {{ option.quantity }}</div>
                     </div>
                   </div>
-
-                  <div class="col-span-1">{{ item.name }}</div>
-                  <div class="col-span-1">{{ item.color }}</div>
-                  <div class="col-span-1">{{ formatCurrency(item.price) }}</div>
-                  <div class="col-span-1 text-center">{{ item.quantity }}</div>
                 </div>
-              </div>
-              <div class="flex justify-end mr-[40px] mt-[20px] text-[20px] font-[600]">
-                <div>Total: {{ formatCurrency(sumCart) }}</div>
               </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Close
               </button>
-              <button @click="handlePay()" type="button" class="btn btn-primary">Pay</button>
+              <button
+                @click="handleAddToCart(item.indexItemAdd)"
+                type="button"
+                class="btn btn-primary"
+              >
+                Add to cart
+              </button>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-4 gap-4 mt-5 px-12">
-      <div
-        v-for="(item, index) in listData"
-        :key="item.id"
-        class="relative col-span-1 border border-black rounded-lg overflow-hidden transform transition-transform hover:scale-105"
-      >
-        <div v-if="item.isHot" class="bg-yellow-300 p-1 absolute top-0 left-0">Hot</div>
-        <div class="w-full overflow-hidden">
-          <img class="w-full h-48 object-cover" :src="item.image" alt="Image" />
-        </div>
-        <div class="px-3 pb-2 flex justify-between items-center">
-          <div>
-            <div class="text-lg font-semibold">{{ item.name }}</div>
-            <div>Price: {{ formatCurrency(item.price) }}</div>
-          </div>
-          <button
-            @click="handleChooseItem(index)"
-            class="p-1 border border-black rounded-lg hover:bg-slate-400"
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div>
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-              {{ listData?.[item.indexItemAdd]?.name || null }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="mx-auto h-[200px] w-[90%] overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                :src="setImg(item.selectedColor)"
-                alt=""
-              />
-            </div>
-            <div class="grid grid-cols-6 mt-[10px]">
-              <div class="col-span-4">
-                <div>
-                  Price:
-                  {{ formatCurrency(listData?.[item.indexItemAdd]?.price || null) }}
-                </div>
-                <div>Brand: {{ listData?.[item.indexItemAdd]?.brand || null }}</div>
-                <div>
-                  Description: {{ listData?.[item.indexItemAdd]?.description || null }}
-                </div>
-                <div>
-                  Release: {{ formatDate(listData?.[item.indexItemAdd]?.release || "") }}
-                </div>
-              </div>
-              <div class="col-span-2">
-                <div>
-                  <div
-                    v-for="(option, index) in listData?.[item.indexItemAdd]?.option || []"
-                    :key="index"
-                    class="flex items-center gap-[5px] mt-[5px]"
-                  >
-                    <input
-                      type="radio"
-                      :disabled="!checkQuantity(option.quantity || 0)"
-                      v-model="item.selectedColor"
-                      :value="option.color"
-                    />
-
-                    <div
-                      class="w-[30px] h-[30px] rounded-full"
-                      :style="{ backgroundColor: option.color }"
-                    ></div>
-
-                    <div>Quantity: {{ option.quantity }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button
-              @click="handleAddToCart(item.indexItemAdd)"
-              type="button"
-              class="btn btn-primary"
-            >
-              Add to cart
-            </button>
           </div>
         </div>
       </div>
@@ -392,10 +398,10 @@ const handleAddToCart = (index) => {
     }
   }
 };
-const handlePay = ()=>{
-    cart.value.listCart = [];
-    alert("Mua hàng thành cômg");
-}
+const handlePay = () => {
+  cart.value.listCart = [];
+  alert("Mua hàng thành cômg");
+};
 const sumCart = computed(() =>
   cart.value.listCart.reduce((total, item) => {
     return total + item.quantity * item.price;
